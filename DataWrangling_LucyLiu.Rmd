@@ -1,0 +1,59 @@
+---
+title: "Radiation Project Data Wrangling"
+author: "Lucy Liu"
+date: "11/12/2023"
+output: html_document
+---
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyr)
+
+# Function to read and clean data
+read_and_clean <- function(file_path, drop_last_n = 3) {
+  raw_data <- read_excel(file_path)
+  cleaned_data <- head(raw_data, -drop_last_n)
+  return(cleaned_data)
+}
+
+# File 1: USLCC-Pat_Category_Codes-Updated
+CategoryCodes <- read_and_clean("D:/NCSU/Fall2023Senior/ST495/Project/Raw_Data/USLCC-Pat_Category_Codes-Updated.xlsx")
+
+# File 2: ErrorMasterChart
+ErrorMasterChart <- read_and_clean("D:/NCSU/Fall2023Senior/ST495/Project/Raw_Data/USLCC-Error_Master-Chart ID DELETED-Updated.xlsx") %>%
+  filter(!is.na(CHART_ID)) %>%
+  select(ID = ERROR_CODE, DEVID, DESCR_IF_MISC, DESCRIPTION, DEV_TYPE, DATE_ID, IDENTIFIED_BY, DATE_CREATED, DATE_MODIFIED, AFFECTED_TREATMENT, CORRECTED) %>%
+  mutate(DEVID = as.numeric(DEVID))
+
+# File 3: USLCC-Pat_Error_Lookup-Updated
+ErrorLookup <- read_and_clean("D:/NCSU/Fall2023Senior/ST495/Project/Raw_Data/USLCC-Pat_Error_Lookup-Updated.xlsx")
+
+# Merge and select important variables
+combined_df <- merge(ErrorMasterChart, ErrorLookup, by = "ID") %>%
+  select(ID, DEVID, DESCR_IF_MISC, DESCRIPTION, CATEGORY1_ID, CATEGORY2_ID, ATTRIBUTE_ID, IS_POST, DEV_TYPE, DATE_ID, IDENTIFIED_BY, DATE_CREATED, DATE_MODIFIED, AFFECTED_TREATMENT, CORRECTED)
+
+# Combine Category1_ID, category2_ID and attribute_ID to corresponding 1,2,3s
+combined_longer <- pivot_longer(combined_df, cols = c(CATEGORY1_ID, CATEGORY2_ID, ATTRIBUTE_ID),
+                                names_to = "ERROR_LEVEL_TYPE", values_to = "SUB_ID") %>%
+  mutate(CATLEVEL = case_when(
+    ERROR_LEVEL_TYPE == "CATEGORY1_ID" ~ 1,
+    ERROR_LEVEL_TYPE == "CATEGORY2_ID" ~ 2,
+    ERROR_LEVEL_TYPE == "ATTRIBUTE_ID" ~ 3
+  )) %>%
+  select(-ERROR_LEVEL_TYPE)
+
+# Get ERROR_LEVEL_NAME using USLCC-Pat_Category_Codes-Updated
+names(CategoryCodes) <- c("SUB_ID", "CATLEVEL", "ERROR_LEVEL_NAME")
+
+finalversion <- merge(select(CategoryCodes, SUB_ID, CATLEVEL, ERROR_LEVEL_NAME),
+                  combined_longer, by = c("SUB_ID", "CATLEVEL")) %>%
+  select(SUB_ID, CATLEVEL, ERROR_LEVEL_NAME, DEVID, DESCR_IF_MISC, DESCRIPTION, DEV_TYPE, ID, IS_POST, DATE_ID, IDENTIFIED_BY, DATE_CREATED, DATE_MODIFIED, AFFECTED_TREATMENT, CORRECTED)
+
+```
+```{r}
+# Write CSV
+directory = "D:/NCSU/Fall2023Senior/ST495/Project/Raw_Data"
+write.csv(x = finalversion,
+          file.path(directory, "Cleaned_Data_LucyLiu.csv"),
+          row.names = FALSE)
+```
