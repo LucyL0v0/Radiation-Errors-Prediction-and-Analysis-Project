@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><title>R: USLCC Data for Analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<script type="text/javascript">
+const macros = { "\\R": "\\textsf{R}", "\\code": "\\texttt"};
+function processMathHTML() {
+    var l = document.getElementsByClassName('reqn');
+    for (let e of l) { katex.render(e.textContent, e, { throwOnError: false, macros }); }
+    return;
+}</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"
+    onload="processMathHTML();"></script>
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table style="width: 100%;"><tr><td>USLCC Error Chart</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+USLCC Data for Analysis
+</h2>
+
+<h3>Description</h3>
+
+<p>This dataset represents the Error Master Chart from the USLCC Center. Each observation represents one error event that occurred during the process of Radiation Oncology following the treatment and is identified by a unique ID. Each observation includes some collected data in the form of a free text field, an identification date, the role of the identifying individual, the treatment intent, and the treatment method. The category classifies each observation that the error event falls into, represented by the BroadCat variable. BroadCat is a collapsed super category into four levels from the original ten levels of the event category and represents which part of the radiotherapy process the error occurred in. For the sake of proper statistical analysis, the records with a super-category of &quot;Treatment&quot; have been removed as there were too few records to provide any predictive power. This data was consolidated by RadPhysics Services LLC and cleaned by NCSU ST495 Team B to create a classification model that will classify an error event by the Error Category that it should fall into, using the features included in the dataset.
+</p>
+
+
+<h3>Format</h3>
+
+<p>A data frame with 285 observations on the following 11 variables.
+</p>
+
+<dl>
+<dt><code>ID</code></dt><dd><p>The unique ID for the error event.</p>
+</dd>
+<dt><code>BroadCat</code></dt><dd><p>The Error Category collapsed into one of three super-categories as described in <a href="%22https://www.mdpi.com/2075-4418/13/7/1215%22">&quot;Automated Error Labeling in Radiation Oncology via Statistical Natural Language Processing&quot;</a>.</p>
+</dd>
+<dt><code>IDbyRole</code></dt><dd><p>Role(s) of the person who identified and input the deviation and their letter convention.</p>
+</dd>
+<dt><code>DateTime</code></dt><dd><p>Date and time when the attribute was selected by the user.</p>
+</dd>
+<dt><code>Quarter</code></dt><dd><p>The quarter of the year when the attribute was selected by the user.</p>
+</dd>
+<dt><code>Month</code></dt><dd><p>The month of the year when the attribute was selected by the user.</p>
+</dd>
+<dt><code>TXIntent</code></dt><dd><p>User is asked the following regarding the treatment intent: 0 = NA, 1 = Curative, 2 = Palliative (pain relief only).</p>
+</dd>
+<dt><code>TXMethod</code></dt><dd><p>User is asked what kind of treatment method is being utilized: 0 = NA, 1 = Conventional EBRT, 2 = 3D-CRT, 3 = IMRT, 4 = SRS, 5 = SBRT.</p>
+</dd>
+<dt><code>Status</code></dt><dd><p>Ranges from 7 to 10.</p>
+</dd>
+<dt><code>DevType</code></dt><dd><p>Main type of deviation selected by the user on the first screen when entering an error: 0 = Clinical, 1 = Radiation Safety, 2 = Quality Assurance.</p>
+</dd>
+<dt><code>Desc</code></dt><dd><p>After an attribute (deviation) is selected, this is the free text description input by the user describing the details of the deviation.</p>
+</dd>
+</dl>
+
+
+
+<h3>Source</h3>
+
+<p>Data: (2023) RadPhysics Services LLC
+</p>
+
+
+</div>
+</body></html>
